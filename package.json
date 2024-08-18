@@ -1,0 +1,22 @@
+{
+  "name": "playwright-e2e-tests",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "msw": "^2.3.1",
+    "playwright-msw": "^3.0.1"
+  },
+  "exports": {
+    "./browser": {
+      "node": null
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.1",
+    "dotenv": "^16.4.5",
+    "eslint": "^8.38.0",
+    "typescript": "^5.5.3"
+  }
+}
