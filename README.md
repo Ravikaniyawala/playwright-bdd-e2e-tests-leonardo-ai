@@ -1,218 +1,125 @@
-# README #
 
-# Project Structure and Setup Guide
+# Playwright E2E Tests with Leonardo AI
+
+This project provides an end-to-end (E2E) testing framework using [Playwright](https://playwright.dev/) and [Cucumber.js](https://cucumber.io/) to validate Leonardo AI workflows. It follows a behavior-driven development (BDD) approach and integrates features like tracing, video recording on failures, and automated reporting.
 
 ## Project Structure
 
-### Component Tests
+```
+.
+├── features/                 # Contains feature files written in Gherkin syntax
+│   └── scramblerTest.feature
+├── step-definitions/         # Contains step definitions for Gherkin scenarios
+│   └── ScramblerTest.steps.ts
+├── support/                  # Cucumber.js support files (hooks, world, etc.)
+│   ├── hooks.ts
+│   └── world.ts
+├── pages/                    # Page Object Model (POM) classes
+├── reports/                  # Stores test reports and traces
+├── utils/                    # Utility scripts (e.g., test data)
+├── playwright-report/        # Playwright's HTML test reports
+├── generate-report.js        # Script for generating custom HTML reports
+├── package.json              # Node.js dependencies and scripts
+├── playwright.config.ts      # Playwright configuration
+├── tsconfig.json             # TypeScript configuration
+```
 
-componentTest/
-├── fixture/
-│   ├── orderIntent2.ts
-│   ├── orderPayload2.ts
-│   └── orderPayload.ts
-├── handlers/
-│   ├── nullOrderHandlers.ts
-│   └── OrderHandlers.ts
-├── node_modules/
-├── pages/
-│   ├── implementations/
-│   │   └── UppPageImpl.ts
-│   ├── interfaces/
-│   │   └── IUppPage.ts
-│   └── BasePage.ts
-├── test-results/
-├── tests/
-│   ├── baseTest.ts
-│   └── mockexample.spec.ts
-└── utils/
-    ├── testdata/
-    │   └── Card.ts
-    ├── MockHelper.ts
-    └── OrderIntent.ts
+## Features
 
+- **BDD-Style Testing**: Uses Cucumber.js for Gherkin scenarios.
+- **Playwright Automation**: For browser interactions and testing.
+- **Page Object Model (POM)**: Encapsulates page-specific logic.
+- **Tracing and Video Recording**: Captures execution traces and videos for debugging.
+- **Automated Reporting**: Generates HTML reports for test execution summaries.
 
-### End-to-End Tests
+## Setup
 
-endToEndTest/
-├── fixture/
-│   └── orderPayload.ts
-├── node_modules/
-├── pages/
-│   ├── components/
-│   │   ├── CardDetailsComponent.ts
-│   │   ├── ThreeDSComponent.ts
-│   ├── implementations/
-│   │   └── UppPageImpl.ts
-│   ├── interfaces/
-│   │   └── IUppPage.ts
-│   ├── BasePage.ts
-│   └── PageFactory.ts
-├── test-results/
-├── tests/
-│   ├── 3dsError.spec.ts
-│   └── baseTest.ts
-└── utils/
-    ├── testdata/
-    │   └── Card.ts
-    ├── OrderIntent.ts
-    ├── RequestHelper.ts
-    ├── UppPageUrl.ts
-    ├── config.ts
+### Prerequisites
 
+- Node.js (v22)
+- npm or Yarn
+- Chromium (managed by Playwright)
 
-## Page Object and Factory Pattern
+### Installation
 
-This project uses the Page Object and Factory Pattern for managing the page objects.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd playwright-e2e-tests-leonardo-ai
+   ```
 
-### Example of Page Factory
-```typescript
-import { Page } from '@playwright/test';
-import { IUppPage } from './IUppPage';
-import { UppPageImpl } from './implementations/UppPageImpl';
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-export class PageFactory {
-  constructor(private page: Page) {}
+3. Ensure browsers are installed:
+   ```bash
+   npx playwright install
+   ```
 
-  createUppPage(version: 'v1' | 'v2'): IUppPage {
-    if (version === 'v2') {
-      return new UppPageImpl(this.page);
-    }
-    // Add logic for v1 if necessary
-    throw new Error('Unsupported version');
-  }
-}
+## Running Tests
 
+### Run All Tests
 
-Component Tests
+```bash
+npm run specTest
+```
 
-Adding Mocks
+This runs Playwright tests and generates an HTML report.
 
-Mocks can be added either using the ...handlers or the MockHelper.
+### Run Cucumber Tests with Specific Tags @moke or @e2e
 
-Using ...handlers
+```bash
+npx cucumber-js --tags "@smoke"
+```
 
-await worker.use(...handlers);
+### Generate HTML Report
 
+```bash
+node generate-report.js
+```
 
-Using MockHelper
+### View Traces
 
-import { MockHelper } from '../utils/MockHelper';
+```bash
+npx playwright show-trace ./reports/trace-<timestamp>.zip
+```
 
-const mockHelper = new MockHelper(page);
-await mockHelper.mockApi('/v1/orders/*', [null], 200);
+## Configuration
 
+### Playwright Config
 
-End-to-End Tests
+The `playwright.config.ts` file specifies browser options, test timeout, and default configurations.
 
-Configurations
+### Cucumber.js Config
 
-The project uses environment variables to configure the testing environment and dependency environment. The configurations are defined in utils/config.ts.
+Located in `cucumber.js`:
 
-Environment Variables
-
-	•	DEPENDENCY_ENV: Specifies the environment for dependencies (e.g., dev, abc, xyz).
-	•	TEST_ENV: Specifies the environment for testing (e.g., local, dev, test, abc, xyz).
-    •	ORDER_API_[ENV]: Specifies the xyz for order creation (e.g., local, dev, test, abc, xyz).
-    •	PAYMENT_API_[ENV]: Specifies the xyz for intent creation (e.g., local, dev, test, abc, xyz).
-
-
-Ensure these environment variables are set appropriately before running the tests.
-
-Proxy Configuration
-
-The playwright.config.ts file is configured to use different proxies based on the TEST_ENV environment variable.
-
-
-const proxy = {
-  server: process.env.TEST_ENV?.toLowerCase() === 'local'
-    ? 'qrst'
-    : process.env.TEST_ENV?.toLowerCase() === 'dev'
-    ? 'mnop'
-    : process.env.TEST_ENV?.toLowerCase() === 'test'
-    ? 'ijkl'
-    : process.env.TEST_ENV?.toLowerCase() === 'xyz'
-    ? 'efgh'
-    : 'abcd',
+```javascript
+module.exports = {
+    default: {
+        require: ['step-definitions/**/*.ts', 'support/**/*.ts'],
+        format: ['json:./reports/cucumber-report.json'],
+        paths: ['features/**/*.feature'],
+        requireModule: ['ts-node/register'],
+    },
 };
+```
 
+## Debugging
 
-JWT Setup and Parameters
+- **Trace Viewer**: Open `.zip` traces in the Playwright trace viewer.
+- **Videos**: Check `./reports/videos` for videos of failed tests.
 
-Ensure that the JWTs and environment parameters are correctly set up for end-to-end tests. These can be configured in the config.ts file using process.env.
+## Contributing
 
-JWT Configuration
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/foo`).
+3. Commit your changes (`git commit -m 'Add foo'`).
+4. Push to the branch (`git push origin feature/foo`).
+5. Open a pull request.
 
-In utils/config.ts, JWT tokens are configured based on the environment variables:
+## License
 
-const config = {
-  orderApi: {
-    dev: {
-      url: '',
-      jwt: process.env.varA || '',
-    },
-    test: {
-      url: '',
-      jwt: process.env.varB || '',
-    },
-    qual: {
-      url: '',
-      jwt: process.env.varC || '',
-    },
-    prod: {
-      url: '',
-      jwt: process.env.varD || '',
-    },
-  },
-  paymentIntentApi: {
-    dev: {
-      url: '',
-      jwt: process.env.varA || '',
-    },
-    test: {
-      url: '',
-      jwt: process.env.varB || '',
-    },
-    qual: {
-      url: '',
-      jwt: process.env.varC || '',
-    },
-    prod: {
-      url: '',
-      jwt: process.env.varD || '',
-    },
-  },
-};
-
-export default config;
-
-
-
-Request Helper
-
-The end-to-end tests use the RequestHelper class for making API requests. This class leverages Playwright’s API capabilities.
-
-
-import { request } from '@playwright/test';
-
-export class RequestHelper {
-  constructor(private headers: Record<string, string>) {}
-
-  async postRequest(url: string, data: any) {
-    const response = await request.post(url, {
-      headers: this.headers,
-      data,
-    });
-    return response;
-  }.....
-}
-
-
-
-Running Tests
-
-Navigate to the respective directory (endToEndTest or componentTest), install the dependencies, and run the tests.
-
-npm install
-npx playwright install
-npm test
+[MIT License](LICENSE)
