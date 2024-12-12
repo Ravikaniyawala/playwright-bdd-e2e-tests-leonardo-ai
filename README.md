@@ -3,6 +3,8 @@
 
 This project provides an end-to-end (E2E) testing framework using [Playwright](https://playwright.dev/) and [Cucumber.js](https://cucumber.io/) to validate Leonardo AI workflows. It follows a behavior-driven development (BDD) approach and integrates features like tracing, video recording on failures, and automated reporting.
 
+The project uses a **Component Object Model (COM)** and **Page Factory Framework** to organize and manage page-specific logic, making the tests scalable and maintainable.
+
 ## Project Structure
 
 ```
@@ -29,6 +31,8 @@ This project provides an end-to-end (E2E) testing framework using [Playwright](h
 - **BDD-Style Testing**: Uses Cucumber.js for Gherkin scenarios.
 - **Playwright Automation**: For browser interactions and testing.
 - **Page Object Model (POM)**: Encapsulates page-specific logic.
+- **Component Object Model (COM)**: Modularizes page interactions for reusability and scalability.
+- **Page Factory Framework**: Simplifies the initialization and management of page objects.
 - **Tracing and Video Recording**: Captures execution traces and videos for debugging.
 - **Automated Reporting**: Generates HTML reports for test execution summaries.
 
@@ -38,7 +42,7 @@ This project provides an end-to-end (E2E) testing framework using [Playwright](h
 
 - Node.js (v22)
 - npm or Yarn
-- Chromium (managed by Playwright)
+- Chromium
 
 ### Installation
 
@@ -58,6 +62,14 @@ This project provides an end-to-end (E2E) testing framework using [Playwright](h
    npx playwright install
    ```
 
+### Environment Variables
+
+You can manage browser configurations and other parameters using a `.env` file. Example:
+
+```env
+BROWSER=chromium
+```
+
 ## Running Tests
 
 ### Run All Tests
@@ -68,7 +80,7 @@ npm run specTest
 
 This runs Playwright tests and generates an HTML report.
 
-### Run Cucumber Tests with Specific Tags @moke or @e2e
+### Run Cucumber Tests with Specific Tags
 
 ```bash
 npx cucumber-js --tags "@smoke"
